@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  omnipeek-backend:
+    image: omnipeek/worker-engine:latest
+    container_name: omnipeek_worker
+    restart: always
+    environment:
+      - OMNIPEEK_ENV=production
+      - THUMBNAIL_DPI=192
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./cache:/app/cache

@@ -1,0 +1,7 @@
+组件名称,模块类型,常驻内存(MB),首帧响应耗时(ms),支持扩展名数量
+OmniPeekExtension.dll,COM 微内核,4.2,12,70
+OmniPeekWorker.exe,多模态后台引擎,0.0,35,70
+cad-3d,三维工业插件,28.5,18,18
+media-player,多媒体插件,14.0,10,18
+dev-docs,开发文档插件,8.5,8,27
+archive-font,归档字体插件,6.2,9,9

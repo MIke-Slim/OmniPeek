@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OmniPeekRegistry version="1.0">
+  <Extensions total="72">
+    <Category name="CAD_3D" count="18">
+      <Format ext=".step" handler="cad-3d" />
+      <Format ext=".stl" handler="cad-3d" />
+      <Format ext=".glb" handler="cad-3d" />
+    </Category>
+    <Category name="Media" count="18">
+      <Format ext=".mp4" handler="media-player" />
+      <Format ext=".wav" handler="media-player" />
+    </Category>
+    <Category name="DevDocs" count="27">
+      <Format ext=".md" handler="dev-docs" />
+      <Format ext=".json" handler="dev-docs" />
+      <Format ext=".xlsx" handler="dev-docs" />
+    </Category>
+    <Category name="ArchiveFont" count="9">
+      <Format ext=".zip" handler="archive-font" />
+      <Format ext=".ttf" handler="archive-font" />
+    </Category>
+  </Extensions>
+</OmniPeekRegistry>

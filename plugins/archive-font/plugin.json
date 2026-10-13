@@ -1,0 +1,20 @@
+{
+  "id": "archive-font",
+  "name": "压缩包与字体特殊格式引擎",
+  "version": "1.0.0",
+  "description": "支持 ZIP/7Z/RAR/TAR/GZ 免解压极速目录树浏览与压缩率分析，以及 TTF/OTF/WOFF 字体瀑布流与字形表预览",
+  "entry": "plugin.js",
+  "previewMode": "archive-font",
+  "thumbnailMode": "archive-card",
+  "formats": [
+    { "ext": ".zip",   "label": ".zip (ZIP 压缩归档目录树)",            "category": "4. 压缩包与特殊格式", "previewMode": "archive", "thumbnailMode": "archive-card", "workerAction": "archive-list" },
+    { "ext": ".7z",    "label": ".7z (7-Zip 高压缩比归档目录树)",       "category": "4. 压缩包与特殊格式", "previewMode": "archive", "thumbnailMode": "archive-card", "workerAction": "archive-list" },
+    { "ext": ".rar",   "label": ".rar (RAR 压缩归档目录树)",            "category": "4. 压缩包与特殊格式", "previewMode": "archive", "thumbnailMode": "archive-card", "workerAction": "archive-list" },
+    { "ext": ".tar",   "label": ".tar (TAR 归档包目录树)",              "category": "4. 压缩包与特殊格式", "previewMode": "archive", "thumbnailMode": "archive-card", "workerAction": "archive-list" },
+    { "ext": ".gz",    "label": ".gz (Gzip 压缩包预览)",                "category": "4. 压缩包与特殊格式", "previewMode": "archive", "thumbnailMode": "archive-card", "workerAction": "archive-list" },
+    { "ext": ".ttf",   "label": ".ttf (TrueType 字体瀑布流与字形预览)", "category": "4. 压缩包与特殊格式", "previewMode": "font",    "thumbnailMode": "font-card",    "workerAction": "" },
+    { "ext": ".otf",   "label": ".otf (OpenType 字体瀑布流与字形预览)", "category": "4. 压缩包与特殊格式", "previewMode": "font",    "thumbnailMode": "font-card",    "workerAction": "" },
+    { "ext": ".woff",  "label": ".woff (Web Open Font 字体预览)",       "category": "4. 压缩包与特殊格式", "previewMode": "font",    "thumbnailMode": "font-card",    "workerAction": "" },
+    { "ext": ".woff2", "label": ".woff2 (WOFF2 现代网页字体预览)",      "category": "4. 压缩包与特殊格式", "previewMode": "font",    "thumbnailMode": "font-card",    "workerAction": "" }
+  ]
+}

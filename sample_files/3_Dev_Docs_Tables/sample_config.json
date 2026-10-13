@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/omnipeek-config.json",
+  "name": "OmniPeek Universal Previewer",
+  "version": "1.0.0",
+  "engine": {
+    "core": "WebView2",
+    "hardwareAcceleration": true,
+    "maxCacheSizeMB": 2048
+  },
+  "modules": [
+    { "id": "cad-3d", "enabled": true, "formats": 18 },
+    { "id": "media-player", "enabled": true, "formats": 18 },
+    { "id": "dev-docs", "enabled": true, "formats": 27 },
+    { "id": "archive-font", "enabled": true, "formats": 9 }
+  ],
+  "preferences": {
+    "theme": "dark",
+    "autoPlayMedia": true,
+    "defaultVolume": 65
+  }
+}

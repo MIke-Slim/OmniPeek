@@ -1,0 +1,29 @@
+{
+  "id": "media-player",
+  "name": "音视频与多媒体工作室",
+  "version": "1.0.0",
+  "description": "支持主流视频、无损音频与矢量动图播放，内置倍速控制、逐帧步进、视频截图与 WebAudio 64 频段实时频谱仪",
+  "entry": "plugin.js",
+  "previewMode": "media",
+  "thumbnailMode": "media-card",
+  "formats": [
+    { "ext": ".mp4",  "label": ".mp4 (MPEG-4 高清视频)",          "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".mkv",  "label": ".mkv (Matroska 多轨封装视频)",    "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".webm", "label": ".webm (WebM 开放媒体视频)",       "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".mov",  "label": ".mov (QuickTime 视频)",           "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".avi",  "label": ".avi (Audio Video Interleave)",   "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".m4v",  "label": ".m4v (iTunes 视频格式)",          "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".3gp",  "label": ".3gp (移动设备视频)",             "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".ogv",  "label": ".ogv (Ogg Theora 视频)",          "category": "2. 音视频与多媒体格式", "previewMode": "video", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".mp3",  "label": ".mp3 (MPEG Audio Layer III)",     "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".flac", "label": ".flac (无损音频编码格式)",        "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".wav",  "label": ".wav (Waveform 无损音频)",        "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".aac",  "label": ".aac (Advanced Audio Coding)",    "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".ogg",  "label": ".ogg (Ogg Vorbis 音频)",          "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".m4a",  "label": ".m4a (MPEG-4 音频流)",            "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".opus", "label": ".opus (Opus 低延迟高音质音频)",   "category": "2. 音视频与多媒体格式", "previewMode": "audio", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".svg",  "label": ".svg (可缩放矢量图形)",           "category": "2. 音视频与多媒体格式", "previewMode": "image", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".webp", "label": ".webp (WebP 现代高清图像)",       "category": "2. 音视频与多媒体格式", "previewMode": "image", "thumbnailMode": "media-card", "workerAction": "" },
+    { "ext": ".gif",  "label": ".gif (GIF 动态图像)",             "category": "2. 音视频与多媒体格式", "previewMode": "image", "thumbnailMode": "media-card", "workerAction": "" }
+  ]
+}

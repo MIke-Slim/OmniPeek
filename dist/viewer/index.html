@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniPeek Universal Preview Host</title>
+    <link rel="stylesheet" href="viewer.css">
+    <!-- Offline Embedded Three.js Engine & Loaders for CAD/3D Plugin -->
+    <script src="libs/three.min.js"></script>
+    <script src="libs/OrbitControls.js"></script>
+    <script src="libs/STLLoader.js"></script>
+    <script src="libs/OBJLoader.js"></script>
+    <script src="libs/GLTFLoader.js"></script>
+    <script src="libs/fflate.min.js"></script>
+    <script src="libs/3MFLoader.js"></script>
+    <script src="libs/NURBSUtils.js"></script>
+    <script src="libs/NURBSCurve.js"></script>
+    <script src="libs/FBXLoader.js"></script>
+    <script src="libs/PLYLoader.js"></script>
+    <script src="libs/GCodeLoader.js"></script>
+    <script src="libs/ColladaLoader.js"></script>
+    <script src="libs/TDSLoader.js"></script>
+    <script src="libs/PCDLoader.js"></script>
+    <script src="libs/DXFLoader.js"></script>
+</head>
+<body class="theme-dark">
+
+    <!-- ================================================================ -->
+    <!-- STAGE A: 3D & Industrial CAD Viewport (Used by cad-3d plugin)    -->
+    <!-- ================================================================ -->
+    <div id="cad-stage" style="display: none; width: 100%; height: 100%; position: relative;">
+        <div id="canvas-container"></div>
+
+        <!-- 顶部状态与交互工具条 -->
+        <div id="top-toolbar">
+            <div class="tool-group">
+                <button class="btn active" id="btn-mode-shaded-edges" data-render-mode="shaded_edges" title="实体加结构特征线">渲染+边线</button>
+                <button class="btn" id="btn-mode-shaded" data-render-mode="shaded" title="纯着色高光实体">纯实体</button>
+                <button class="btn" id="btn-mode-wireframe" data-render-mode="wireframe" title="网格线框模式">线框</button>
+            </div>
+
+            <div class="tool-group">
+                <button class="btn" id="btn-view-iso" data-view="iso" title="轴测等轴视图">等轴测</button>
+                <button class="btn" id="btn-view-top" data-view="top" title="顶视图">顶视</button>
+                <button class="btn" id="btn-view-front" data-view="front" title="前视图">前视</button>
+                <button class="btn" id="btn-view-right" data-view="right" title="右视图">右视</button>
+                <button class="btn" id="btn-fit" title="居中自适应大小">适配</button>
+            </div>
+
+            <div class="tool-group">
+                <button class="btn" id="btn-dimensions" title="三维包围盒工程尺寸标注">📐 标注</button>
+                <button class="btn" id="btn-measure" title="测量两点距离">📏 测量</button>
+                <button class="btn" id="btn-section" title="剖切截面观察">✂️ 剖切</button>
+                <button class="btn" id="btn-tree" title="零部件装配结构树">🌲 部件 (<span id="tree-count">0</span>)</button>
+                <select id="theme-selector" class="theme-select" title="视口背景主题">
+                    <option value="theme-dark">🌌 深色科技</option>
+                    <option value="theme-blueprint">📐 工业蓝图</option>
+                    <option value="theme-studio">💡 摄影白底</option>
+                    <option value="theme-grid">🏁 透明棋盘</option>
+                </select>
+                <select id="lang-selector" class="theme-select" title="Language / 界面语言">
+                    <option value="zh">🇨🇳 简中</option>
+                    <option value="en">🇺🇸 EN</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 测量浮动工具条 -->
+        <div id="measure-bar" class="floating-tool-bar">
+            <span class="tool-title">📏 测距:</span>
+            <span class="tool-val" id="measure-result">点击模型拾取两点</span>
+            <button class="btn" id="btn-measure-clear">清除</button>
+            <button class="btn" id="btn-measure-close">关闭</button>
+        </div>
+
+        <!-- 剖切截面工具条 -->
+        <div id="section-bar" class="floating-tool-bar">
+            <span class="tool-title">✂️ 剖切:</span>
+            <button class="btn active" id="sec-axis-x" data-axis="x">X轴</button>
+            <button class="btn" id="sec-axis-y" data-axis="y">Y轴</button>
+            <button class="btn" id="sec-axis-z" data-axis="z">Z轴</button>
+            <input type="range" id="sec-slider" min="0" max="100" value="50">
+            <button class="btn" id="sec-invert">反向</button>
+            <button class="btn" id="btn-section-close">关闭</button>
+        </div>
+
+        <!-- 零部件装配结构树侧边抽屉 -->
+        <div id="tree-drawer" class="tree-drawer hidden">
+            <div class="tree-header">
+                <span class="tree-title">🌲 零部件结构树</span>
+                <div class="tree-actions">
+                    <button class="btn-icon" id="btn-tree-isolate-reset" title="恢复全部显示">👁️ 显示全部</button>
+                    <button class="btn-icon" id="btn-tree-close" title="收起面板">✕</button>
+                </div>
+            </div>
+            <div class="tree-search-bar">
+                <input type="text" id="tree-search-input" placeholder="🔍 搜索零部件名称..." autocomplete="off">
+            </div>
+            <div id="tree-list" class="tree-list"></div>
+            <div id="tree-status" class="tree-status">
+                <span>点击部件选中高亮，点眼睛切换可见性</span>
+            </div>
+        </div>
+
+        <!-- HUD 信息统计小卡片 -->
+        <div id="info-panel">
+            <div class="title" id="stat-name">等待选择模型...</div>
+            <div class="stat-row">
+                <span class="stat-label">外形尺寸:</span>
+                <span class="stat-val" id="stat-dims">--</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">顶点数量:</span>
+                <span class="stat-val" id="stat-vertices">--</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">三角面数:</span>
+                <span class="stat-val" id="stat-faces">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- STAGE B: Universal Plugin Stage (Media, Code, Docs, Archives...) -->
+    <!-- ================================================================ -->
+    <div id="universal-stage" style="display: none; width: 100%; height: 100%; flex-direction: column;">
+        <header id="omni-header">
+            <div class="omni-header-left">
+                <span id="omni-badge" class="omni-badge">FILE</span>
+                <span id="omni-filename" class="omni-filename">正在加载...</span>
+                <span id="omni-size" class="omni-meta"></span>
+                <span id="omni-status" class="omni-status"></span>
+            </div>
+            <div id="omni-toolbar-slot" class="omni-toolbar-slot"></div>
+        </header>
+        <main id="plugin-stage"></main>
+    </div>
+
+    <!-- Shared Loader Overlay & Toast -->
+    <div id="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <div id="loader-text">正在加载预览...</div>
+    </div>
+
+    <div id="toast"></div>
+
+    <!-- Built-in Official Plugin Modules (Dynamic plugins in ../plugins/* are also auto-loaded by viewer.js) -->
+    <script src="../plugins/cad-3d/plugin.js"></script>
+    <script src="../plugins/media-player/plugin.js"></script>
+    <script src="../plugins/dev-docs/plugin.js"></script>
+    <script src="../plugins/archive-font/plugin.js"></script>
+
+    <!-- Universal Plugin Host Router -->
+    <script src="viewer.js"></script>
+</body>
+</html>

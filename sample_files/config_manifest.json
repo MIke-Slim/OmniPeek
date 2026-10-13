@@ -1,0 +1,10 @@
+{
+  "project": "OmniPeek Universal Previewer",
+  "version": "1.0.0",
+  "architecture": {
+    "comKernel": "OmniPeekExtension.dll",
+    "workerEngine": "OmniPeekWorker.exe",
+    "warmWebView2Pool": true
+  },
+  "plugins": ["cad-3d", "media-player", "dev-docs", "archive-font"]
+}

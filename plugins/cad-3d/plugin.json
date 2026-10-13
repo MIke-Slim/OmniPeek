@@ -1,0 +1,29 @@
+{
+  "id": "cad-3d",
+  "name": "3D 与工业 CAD 引擎",
+  "version": "1.0.0",
+  "description": "支持 18 种工业 CAD 与三维网格格式的交互式 3D 视口、剖切、测距、包围盒标注与 CPU 软光栅立体缩略图",
+  "entry": "plugin.js",
+  "previewMode": "cad-3d",
+  "thumbnailMode": "3d-raster",
+  "formats": [
+    { "ext": ".step",  "label": ".step (STEP 工业三维零件)",       "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "convert-cad" },
+    { "ext": ".stp",   "label": ".stp (STEP 工业装配模型)",        "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "convert-cad" },
+    { "ext": ".iges",  "label": ".iges (IGES 曲面与实体)",         "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "convert-cad" },
+    { "ext": ".igs",   "label": ".igs (IGES 工业交换模型)",        "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "convert-cad" },
+    { "ext": ".brep",  "label": ".brep (OpenCASCADE 边界表示)",    "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "convert-cad" },
+    { "ext": ".brp",   "label": ".brp (B-Rep 拓扑几何)",           "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "convert-cad" },
+    { "ext": ".dxf",   "label": ".dxf (AutoCAD 二维/三维工程图)",  "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".stl",   "label": ".stl (3D 打印三角网格)",          "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".obj",   "label": ".obj (Wavefront 三维网格)",       "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".glb",   "label": ".glb (二进制 glTF 三维资产)",     "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".gltf",  "label": ".gltf (WebGL 标准三维场景)",      "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".3mf",   "label": ".3mf (新一代增材制造格式)",       "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".fbx",   "label": ".fbx (Autodesk 三维交换格式)",    "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".ply",   "label": ".ply (Stanford 三维扫描网格)",    "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".pcd",   "label": ".pcd (PCL 激光雷达点云)",         "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".gcode", "label": ".gcode (CNC / 3D 打印加工刀轨)",  "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".dae",   "label": ".dae (Collada 三维模型)",         "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" },
+    { "ext": ".3ds",   "label": ".3ds (3D Studio 经典网格)",       "category": "1. 3D 与工业 CAD 格式", "previewMode": "cad-3d", "thumbnailMode": "3d-raster", "workerAction": "" }
+  ]
+}

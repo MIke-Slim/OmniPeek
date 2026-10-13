@@ -1,0 +1,29 @@
+# Local toolchains and embedded runtimes (junctions / external)
+tools/w64devkit/
+dist/python/
+
+# Build artifacts and temporary files
+*.obj
+*.o
+*.exp
+*.pdb
+*.tmp
+*.log
+*.bak
+*.swp
+
+# IDE and Editor configurations
+.vscode/
+.idea/
+.vs/
+*.suo
+*.user
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Windows shell files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

@@ -1,0 +1,6 @@
+MetricID	BenchmarkName	LatencyMS	ThroughputRPS	CPUPercent	MemoryMB
+M-101	STEP_Assembly_Tessellation	38.4	1520	24.5	68.2
+M-102	H264_Hardware_Decode_Init	14.2	3890	12.8	32.5
+M-103	Monaco_Syntax_Highlighting	8.1	8200	5.4	18.0
+M-104	ZIP_Central_Directory_Scan	2.6	24500	3.1	6.4
+M-105	Font_Glyph_Metrics_Parse	6.3	11400	4.8	14.2
