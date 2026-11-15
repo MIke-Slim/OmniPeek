@@ -99,27 +99,29 @@
 
 				for ( file in zip ) {
 
-					if ( file.match( /\_rels\/.rels$/ ) ) {
+					const norm = file.replace( /^\//, '' );
+
+					if ( norm.match( /_rels\/\.rels$/i ) ) {
 
 						relsName = file;
 
-					} else if ( file.match( /3D\/_rels\/.*\.model\.rels$/ ) ) {
+					} else if ( norm.match( /_rels\/.*\.model\.rels$/i ) ) {
 
 						modelRelsName = file;
 
-					} else if ( file.match( /^3D\/.*\.model$/ ) ) {
+					} else if ( norm.match( /\.model$/i ) ) {
 
 						modelPartNames.push( file );
 
-					} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
+					} else if ( norm.match( /Metadata\/.*\.xml$/i ) ) {
 
 						printTicketPartNames.push( file );
 
-					} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
+					} else if ( norm.match( /Textures?\/.*\.(png|jpg|jpeg|bmp)$/i ) ) {
 
 						texturesPartNames.push( file );
 
-					} else if ( file.match( /^3D\/Other\/.*/ ) ) {
+					} else {
 
 						otherPartNames.push( file );
 
@@ -128,11 +130,11 @@
 				} //
 
 
-				const relsView = zip[ relsName ];
-				const relsFileText = THREE.LoaderUtils.decodeText( relsView );
-				const rels = parseRelsXml( relsFileText ); //
+				const relsView = relsName ? zip[ relsName ] : null;
+				const relsFileText = relsView ? THREE.LoaderUtils.decodeText( relsView ) : '';
+				const rels = relsFileText ? parseRelsXml( relsFileText ) : []; //
 
-				if ( modelRelsName ) {
+				if ( modelRelsName && zip[ modelRelsName ] ) {
 
 					const relsView = zip[ modelRelsName ];
 					const relsFileText = THREE.LoaderUtils.decodeText( relsView );
@@ -148,22 +150,27 @@
 					const fileText = THREE.LoaderUtils.decodeText( view );
 					const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
-					if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
+					if ( ! xmlData || ! xmlData.documentElement || xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
-						console.error( 'THREE.3MFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
+						console.warn( 'THREE.3MFLoader: Non-model XML or parse error: ', modelPart );
+						continue;
 
 					}
 
-					const modelNode = xmlData.querySelector( 'model' );
+					const modelNode = xmlData.querySelector( 'model' ) || xmlData.documentElement;
 					const extensions = {};
 
-					for ( let i = 0; i < modelNode.attributes.length; i ++ ) {
+					if ( modelNode.attributes ) {
 
-						const attr = modelNode.attributes[ i ];
+						for ( let a = 0; a < modelNode.attributes.length; a ++ ) {
 
-						if ( attr.name.match( /^xmlns:(.+)$/ ) ) {
+							const attr = modelNode.attributes[ a ];
 
-							extensions[ attr.value ] = RegExp.$1;
+							if ( attr.name && attr.name.match( /^xmlns:(.+)$/ ) ) {
+
+								extensions[ attr.value ] = RegExp.$1;
+
+							}
 
 						}
 
@@ -178,7 +185,9 @@
 
 					}
 
-					modelParts[ modelPart ] = modelData;
+					const normKey = modelPart.replace( /^\//, '' );
+					modelParts[ normKey ] = modelData;
+					if ( ! modelParts[ modelPart ] ) modelParts[ modelPart ] = modelData;
 
 				} //
 
@@ -478,6 +487,29 @@
 				const componentData = {};
 				componentData[ 'objectId' ] = componentNode.getAttribute( 'objectid' ); // required
 
+				let path = componentNode.getAttribute( 'p:path' ) || componentNode.getAttribute( 'path' );
+				if ( ! path && componentNode.attributes ) {
+
+					for ( let i = 0; i < componentNode.attributes.length; i ++ ) {
+
+						const attr = componentNode.attributes[ i ];
+						if ( attr.name === 'path' || attr.name.endsWith( ':path' ) || attr.localName === 'path' ) {
+
+							path = attr.value;
+							break;
+
+						}
+
+					}
+
+				}
+
+				if ( path ) {
+
+					componentData[ 'path' ] = path.replace( /^\//, '' );
+
+				}
+
 				const transform = componentNode.getAttribute( 'transform' );
 
 				if ( transform ) {
@@ -666,6 +698,30 @@
 					const buildItem = {
 						objectId: itemNode.getAttribute( 'objectid' )
 					};
+
+					let path = itemNode.getAttribute( 'p:path' ) || itemNode.getAttribute( 'path' );
+					if ( ! path && itemNode.attributes ) {
+
+						for ( let a = 0; a < itemNode.attributes.length; a ++ ) {
+
+							const attr = itemNode.attributes[ a ];
+							if ( attr.name === 'path' || attr.name.endsWith( ':path' ) || attr.localName === 'path' ) {
+
+								path = attr.value;
+								break;
+
+							}
+
+						}
+
+					}
+
+					if ( path ) {
+
+						buildItem[ 'path' ] = path.replace( /^\//, '' );
+
+					}
+
 					const transform = itemNode.getAttribute( 'transform' );
 
 					if ( transform ) {
@@ -1178,23 +1234,57 @@
 
 			}
 
-			function buildComposite( compositeData, objects, modelData, textureData ) {
+			function buildComposite( compositeData, objects, modelData, textureData, currentModelKey, data3mf ) {
 
 				const composite = new THREE.Group();
 
 				for ( let j = 0; j < compositeData.length; j ++ ) {
 
 					const component = compositeData[ j ];
-					let build = objects[ component.objectId ];
+					let targetModelKey = component.path || currentModelKey;
+					if ( targetModelKey ) targetModelKey = targetModelKey.replace( /^\//, '' );
 
-					if ( build === undefined ) {
+					const fullTargetKey = targetModelKey ? ( targetModelKey + '#' + component.objectId ) : component.objectId;
+					let build = objects[ fullTargetKey ] || objects[ component.objectId ];
 
-						buildObject( component.objectId, objects, modelData, textureData );
-						build = objects[ component.objectId ];
+					if ( build === undefined && data3mf && data3mf.model ) {
+
+						// Try to locate target modelData
+						let targetModelData = targetModelKey ? data3mf.model[ targetModelKey ] : null;
+						if ( ! targetModelData ) {
+
+							for ( const k in data3mf.model ) {
+
+								const m = data3mf.model[ k ];
+								if ( m && m.resources && m.resources.object && m.resources.object[ component.objectId ] ) {
+
+									targetModelData = m;
+									targetModelKey = k;
+									break;
+
+								}
+
+							}
+
+						}
+
+						if ( targetModelData && targetModelData.resources && targetModelData.resources.object && targetModelData.resources.object[ component.objectId ] ) {
+
+							buildObject( component.objectId, objects, targetModelData, textureData, targetModelKey, data3mf );
+							build = objects[ targetModelKey + '#' + component.objectId ] || objects[ component.objectId ];
+
+						}
 
 					}
 
-					const object3D = build.clone(); // apply component transform
+					if ( ! build ) {
+
+						console.warn( 'THREE.3MFLoader: Component object not found: id=' + component.objectId + ' path=' + targetModelKey );
+						continue;
+
+					}
+
+					const object3D = build.clone();
 
 					const transform = component.transform;
 
@@ -1212,9 +1302,18 @@
 
 			}
 
-			function buildObject( objectId, objects, modelData, textureData ) {
+			function buildObject( objectId, objects, modelData, textureData, currentModelKey, data3mf ) {
 
-				const objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
+				if ( ! modelData || ! modelData.resources || ! modelData.resources.object ) return null;
+				const objectData = modelData.resources.object[ objectId ];
+				if ( ! objectData ) return null;
+
+				const normModelKey = currentModelKey ? currentModelKey.replace( /^\//, '' ) : '';
+				const fullKey = normModelKey ? ( normModelKey + '#' + objectData.id ) : objectData.id;
+
+				if ( objects[ fullKey ] ) return objects[ fullKey ];
+
+				let built = null;
 
 				if ( objectData[ 'mesh' ] ) {
 
@@ -1222,14 +1321,32 @@
 					const extensions = modelData[ 'extensions' ];
 					const modelXml = modelData[ 'xml' ];
 					applyExtensions( extensions, meshData, modelXml );
-					objects[ objectData.id ] = getBuild( meshData, objects, modelData, textureData, objectData, buildGroup );
+					built = getBuild( meshData, objects, modelData, textureData, objectData, buildGroup );
 
-				} else {
+				} else if ( objectData[ 'components' ] ) {
 
 					const compositeData = objectData[ 'components' ];
-					objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
+					const buildCompFn = function ( cData, objs, mData, tData, oData ) {
+
+						return buildComposite( cData, objs, mData, tData, normModelKey, data3mf );
+
+					};
+					built = getBuild( compositeData, objects, modelData, textureData, objectData, buildCompFn );
 
 				}
+
+				if ( built ) {
+
+					objects[ fullKey ] = built;
+					if ( ! objects[ objectData.id ] ) {
+
+						objects[ objectData.id ] = built;
+
+					}
+
+				}
+
+				return built;
 
 			}
 
@@ -1246,7 +1363,7 @@
 					for ( let i = 0, l = modelRels.length; i < l; i ++ ) {
 
 						const modelRel = modelRels[ i ];
-						const textureKey = modelRel.target.substring( 1 );
+						const textureKey = modelRel.target.replace( /^\//, '' );
 
 						if ( data3mf.texture[ textureKey ] ) {
 
@@ -1256,19 +1373,20 @@
 
 					}
 
-				} // start build
+				}
 
-
+				// Build all objects in all model files
 				for ( let i = 0; i < modelsKeys.length; i ++ ) {
 
 					const modelsKey = modelsKeys[ i ];
 					const modelData = modelsData[ modelsKey ];
-					const objectIds = Object.keys( modelData[ 'resources' ][ 'object' ] );
+					if ( ! modelData || ! modelData.resources || ! modelData.resources.object ) continue;
+					const objectIds = Object.keys( modelData.resources.object );
 
 					for ( let j = 0; j < objectIds.length; j ++ ) {
 
 						const objectId = objectIds[ j ];
-						buildObject( objectId, objects, modelData, textureData );
+						buildObject( objectId, objects, modelData, textureData, modelsKey, data3mf );
 
 					}
 
@@ -1280,36 +1398,101 @@
 
 			function fetch3DModelPart( rels ) {
 
+				if ( ! rels ) return null;
+
 				for ( let i = 0; i < rels.length; i ++ ) {
 
 					const rel = rels[ i ];
-					const extension = rel.target.split( '.' ).pop();
-					if ( extension.toLowerCase() === 'model' ) return rel;
+					if ( rel && rel.target ) {
+
+						const extension = rel.target.split( '.' ).pop();
+						if ( extension && extension.toLowerCase() === 'model' ) return rel;
+
+					}
 
 				}
+
+				return null;
 
 			}
 
 			function build( objects, data3mf ) {
 
 				const group = new THREE.Group();
-				const relationship = fetch3DModelPart( data3mf[ 'rels' ] );
-				const buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
+				const relationship = ( data3mf[ 'rels' ] && data3mf[ 'rels' ].length > 0 ) ? fetch3DModelPart( data3mf[ 'rels' ] ) : null;
+				let rootModelKey = '3D/3dmodel.model';
+
+				if ( relationship && relationship.target ) {
+
+					rootModelKey = relationship.target.replace( /^\//, '' );
+
+				} else if ( data3mf.model && Object.keys( data3mf.model ).length > 0 ) {
+
+					rootModelKey = Object.keys( data3mf.model )[ 0 ];
+
+				}
+
+				const rootModel = data3mf.model[ rootModelKey ];
+				const buildData = rootModel && rootModel[ 'build' ] ? rootModel[ 'build' ] : [];
 
 				for ( let i = 0; i < buildData.length; i ++ ) {
 
 					const buildItem = buildData[ i ];
-					const object3D = objects[ buildItem[ 'objectId' ] ]; // apply transform
+					const targetKey = ( ( buildItem.path || rootModelKey ).replace( /^\//, '' ) ) + '#' + buildItem.objectId;
+					let object3D = objects[ targetKey ] || objects[ buildItem.objectId ];
 
+					if ( ! object3D ) {
+
+						// Fallback: search for matching object id across all models
+						for ( const k in objects ) {
+
+							if ( k.endsWith( '#' + buildItem.objectId ) || k === buildItem.objectId ) {
+
+								object3D = objects[ k ];
+								break;
+
+							}
+
+						}
+
+					}
+
+					if ( ! object3D ) {
+
+						console.warn( 'THREE.3MFLoader: Build item object not found: ' + buildItem.objectId );
+						continue;
+
+					}
+
+					const cloned = object3D.clone();
 					const transform = buildItem[ 'transform' ];
 
 					if ( transform ) {
 
-						object3D.applyMatrix4( transform );
+						cloned.applyMatrix4( transform );
 
 					}
 
-					group.add( object3D );
+					group.add( cloned );
+
+				}
+
+				// Safe fallback: if group has no children, add all available top-level meshes/groups
+				if ( group.children.length === 0 ) {
+
+					const addedIds = new Set();
+
+					for ( const k in objects ) {
+
+						const obj = objects[ k ];
+						if ( obj && ! addedIds.has( obj.id ) ) {
+
+							addedIds.add( obj.id );
+							group.add( obj.clone() );
+
+						}
+
+					}
 
 				}
 
